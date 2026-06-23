@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CreativeCave — Something Is Coming</title>
+<meta name="description" content="CreativeCave. Orlando, Tampa, and St. Petersburg's AI-forward media production and creative advertising studio. Launching August 2026.">
+<meta name="theme-color" content="#060606">
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --bg:#060606;
+  --surface:#0c0c0c;
+  --border:#151515;
+  --text:#e8e6e1;
+  --dim:#6b6860;
+  --mute:#2a2822;
+  --accent:#1DA1F2;
+  --accent-mid:rgba(29,161,242,.25);
+  --accent-lo:rgba(29,161,242,.08);
+  --accent-glow:rgba(29,161,242,.12);
+  --ff:'SF Pro Display',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --fs-xs:clamp(.6875rem,.65rem + .2vw,.75rem);
+  --fs-sm:clamp(.8125rem,.78rem + .2vw,.875rem);
+  --fs-base:clamp(.9375rem,.9rem + .2vw,1rem);
+  --fs-md:clamp(1.0625rem,1rem + .3vw,1.125rem);
+  --fs-lg:clamp(1.25rem,1rem + 1vw,1.75rem);
+  --fs-hero:clamp(2.25rem,1.4rem + 4vw,4.25rem);
+  --fs-count:clamp(1.75rem,1rem + 3vw,3.25rem);
+  --ease:cubic-bezier(.16,1,.3,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;scroll-behavior:smooth}
+body{font-family:var(--ff);font-size:var(--fs-base);line-height:1.6;color:var(--text);background:var(--bg);overflow-x:hidden;min-height:100vh;cursor:default}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+canvas{display:block}
+
+/* ============================================================
+   FULL-SCREEN LAYERS
+   ============================================================ */
+.layer{position:fixed;inset:0;pointer-events:none}
+
+/* Aurora / churning gradient */
+#auroraCanvas{z-index:0;opacity:.7}
+
+/* Scanline grid */
+.scanlines{
+  z-index:1;
+  opacity:.025;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.08) 2px,rgba(255,255,255,.08) 3px);
+  background-size:100% 4px;
+  animation:scanScroll 20s linear infinite;
+}
+@keyframes scanScroll{to{background-position:0 100vh}}
+
+/* Grain */
+.grain{
+  z-index:9998;
+  opacity:.03;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:128px 128px;
+}
+
+/* Vignette */
+.vignette{
+  z-index:2;
+  background:radial-gradient(ellipse 60% 55% at 50% 45%,transparent 30%,rgba(6,6,6,.85) 100%);
+}
+
+/* Cursor bloom */
+.bloom{
+  z-index:3;
+  opacity:0;
+  transition:opacity .3s ease;
+  background:radial-gradient(circle 300px at var(--mx,50%) var(--my,50%),rgba(29,161,242,.04) 0%,transparent 70%);
+}
+body:hover .bloom{opacity:1}
+
+/* Particle canvas */
+#particleCanvas{z-index:4}
+
+/* ============================================================
+   PAGE
+   ============================================================ */
+.page{position:relative;z-index:5;display:flex;flex-direction:column;min-height:100vh}
+
+/* ============================================================
+   WORDMARK (top-left, minimal)
+   ============================================================ */
+/* Main logo — centered at top */
+.hero-logo{
+  width:clamp(180px,38vw,400px);
+  height:auto;
+  filter:invert(1);
+  opacity:0;
+  animation:fadeUp 1s var(--ease) .3s forwards;
+  margin-bottom:0;
+}
+
+@keyframes fadeIn{to{opacity:1}}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:clamp(.75rem,1.5vh,1.25rem) 1.5rem clamp(.5rem,1vh,1rem);
+  text-align:center;
+  gap:0;
+}
+
+/* ============================================================
+   BEAR SCENE
+   ============================================================ */
+.bear-scene{
+  position:relative;
+  width:clamp(180px,28vw,320px);
+  height:clamp(180px,28vw,320px);
+  margin-bottom:clamp(.5rem,1vw,.75rem);
+  perspective:900px;
+  /* Entrance */
+  opacity:0;
+  filter:blur(20px);
+  transform:scale(.85);
+  animation:bearMaterialize 2s var(--ease) .4s forwards;
+}
+@keyframes bearMaterialize{
+  to{opacity:1;filter:blur(0);transform:scale(1)}
+}
+
+/* Deep glow — behind everything, pulses via opacity only (transform driven by JS) */
+.bear-scene__deep-glow{
+  position:absolute;
+  top:10%;left:50%;
+  width:160%;height:120%;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:radial-gradient(ellipse at 50% 65%,var(--accent-glow) 0%,rgba(29,161,242,.03) 45%,transparent 70%);
+  filter:blur(60px);
+  animation:glowPulse 4s ease-in-out infinite alternate;
+  will-change:opacity;
+}
+@keyframes glowPulse{
+  0%{opacity:.6}
+  100%{opacity:1}
+}
+
+/* Halo ring — tighter, brighter, reactive */
+.bear-scene__halo{
+  position:absolute;
+  top:15%;left:50%;
+  width:110%;height:90%;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:radial-gradient(ellipse at 50% 70%,var(--accent-mid) 0%,transparent 55%);
+  filter:blur(35px);
+  opacity:.5;
+  will-change:transform,opacity;
+}
+
+/* Bear body */
+.bear-body{
+  position:relative;
+  width:100%;height:100%;
+  transform-style:preserve-3d;
+  will-change:transform;
+}
+.bear-body img{
+  width:100%;height:100%;
+  object-fit:contain;
+  display:block;
+  /* Edge blending: soft feathered mask fades bottom into glow */
+  mask-image:linear-gradient(to bottom,black 55%,rgba(0,0,0,.6) 80%,transparent 100%);
+  -webkit-mask-image:linear-gradient(to bottom,black 55%,rgba(0,0,0,.6) 80%,transparent 100%);
+  filter:drop-shadow(0 25px 50px rgba(0,0,0,.6));
+}
+
+/* Rim light overlay — slides with cursor */
+.bear-body__rim{
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  background:radial-gradient(ellipse 50% 60% at var(--rimX,55%) var(--rimY,35%),rgba(29,161,242,.12) 0%,transparent 60%);
+  mix-blend-mode:screen;
+  pointer-events:none;
+  will-change:background;
+}
+
+/* Dynamic shadow — anchors bear to space */
+.bear-scene__shadow{
+  position:absolute;
+  bottom:-5%;left:50%;
+  width:60%;height:12%;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:rgba(0,0,0,.5);
+  filter:blur(20px);
+  will-change:transform;
+}
+
+/* ============================================================
+   EYEBROW
+   ============================================================ */
+.eyebrow{
+  font-size:var(--fs-xs);
+  text-transform:uppercase;
+  letter-spacing:.2em;
+  color:var(--dim);
+  font-weight:500;
+  margin-bottom:.5rem;
+  opacity:0;
+  animation:fadeUp .8s var(--ease) .8s forwards;
+}
+
+/* ============================================================
+   HEADLINE
+   ============================================================ */
+.headline{
+  font-size:var(--fs-hero);
+  font-weight:800;
+  line-height:1.1;
+  letter-spacing:-.03em;
+  max-width:700px;
+  margin-bottom:.35rem;
+}
+.headline .word{
+  display:inline-block;
+  opacity:0;
+  transform:translateY(30px) blur(8px);
+  filter:blur(8px);
+  animation:wordIn .9s var(--ease) forwards;
+}
+/* Staggered delays set via inline style */
+@keyframes wordIn{
+  to{opacity:1;transform:translateY(0);filter:blur(0)}
+}
+.headline .accent{color:var(--accent)}
+
+.subline{
+  font-size:var(--fs-md);
+  color:var(--dim);
+  max-width:480px;
+  font-weight:400;
+  line-height:1.4;
+  margin-bottom:0;
+  opacity:0;
+  animation:fadeUp 1s var(--ease) 1.8s forwards;
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ============================================================
+   TRIAD
+   ============================================================ */
+.triad{
+  display:flex;
+  gap:clamp(.75rem,2vw,2rem);
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-top:.75rem;
+  opacity:0;
+  animation:fadeUp .8s var(--ease) 1.9s forwards;
+}
+.triad__word{
+  font-size:var(--fs-lg);
+  font-weight:700;
+  letter-spacing:.02em;
+  color:var(--text);
+}
+
+/* ============================================================
+   COUNTDOWN (compact, under headline)
+   ============================================================ */
+.countdown-wrap{
+  margin-top:clamp(.75rem,1.5vw,1.25rem);
+  opacity:0;
+  animation:fadeUp 1s var(--ease) 2s forwards;
+}
+.countdown{
+  display:flex;
+  gap:clamp(.5rem,1.5vw,1.5rem);
+  justify-content:center;
+  flex-wrap:wrap;
+}
+.cd-block{
+  display:flex;flex-direction:column;align-items:center;gap:.35rem;
+  min-width:clamp(52px,10vw,90px);
+}
+.cd-digits{
+  font-size:var(--fs-count);
+  font-weight:800;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.02em;line-height:1;
+  color:var(--text);
+  overflow:hidden;height:1.1em;
+}
+.cd-digits .d{
+  display:inline-block;
+  transition:transform .4s var(--spring),opacity .3s ease;
+}
+.cd-label{
+  font-size:var(--fs-xs);text-transform:uppercase;
+  letter-spacing:.18em;color:var(--dim);font-weight:500;
+}
+.cd-sep{
+  font-size:var(--fs-count);font-weight:200;color:var(--mute);
+  line-height:1;align-self:flex-start;padding-top:.05em;user-select:none;
+}
+.countdown--live .cd-block,.countdown--live .cd-sep{display:none}
+.cd-live{display:none;font-size:var(--fs-lg);font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.countdown--live .cd-live{display:block}
+
+/* ============================================================
+   EMAIL CAPTURE
+   ============================================================ */
+.signup{
+  margin-top:clamp(1rem,2vw,1.5rem);
+  width:100%;max-width:420px;
+  display:flex;flex-direction:column;gap:.75rem;
+  align-items:center;
+  opacity:0;
+  animation:fadeUp 1s var(--ease) 2.2s forwards;
+}
+.signup__label{
+  font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.15em;
+  color:var(--dim);font-weight:500;
+}
+.signup__form{
+  display:flex;width:100%;
+  border:1px solid var(--border);border-radius:999px;
+  overflow:hidden;background:var(--surface);
+  transition:border-color .2s ease;
+}
+.signup__form:focus-within{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent-lo)}
+.signup__input{
+  flex:1;padding:.75rem 1.25rem;background:transparent;
+  border:none;color:var(--text);font-size:var(--fs-sm);
+  font-family:var(--ff);outline:none;
+}
+.signup__input::placeholder{color:var(--mute)}
+.signup__btn{
+  padding:.75rem 1.5rem;background:var(--accent);color:var(--bg);
+  border:none;font-family:var(--ff);font-size:var(--fs-sm);
+  font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  cursor:pointer;border-radius:0 999px 999px 0;
+  transition:background .2s ease,transform .15s var(--spring);
+  white-space:nowrap;
+}
+.signup__btn:hover{background:#4db5f5}
+.signup__btn:active{transform:scale(.97)}
+.signup__btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.signup__ok{
+  display:none;padding:.75rem 1.5rem;font-size:var(--fs-sm);
+  color:var(--accent);font-weight:600;letter-spacing:.05em;
+  text-transform:uppercase;border:1px solid var(--accent-lo);
+  border-radius:999px;background:var(--accent-lo);
+  animation:popIn .5s var(--spring);
+}
+.signup--done .signup__form{display:none}
+.signup--done .signup__ok{display:inline-flex;align-items:center;gap:.4rem}
+@keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{
+  position:relative;z-index:5;
+  text-align:center;
+  padding:2rem 1.5rem 1.25rem;
+  display:flex;flex-direction:column;align-items:center;gap:.75rem;
+  opacity:0;animation:fadeIn 1s var(--ease) 2.4s forwards;
+}
+.footer__loc{font-size:var(--fs-xs);color:var(--mute);letter-spacing:.1em}
+.footer__socials{display:flex;gap:.75rem}
+.footer__socials a{
+  display:flex;align-items:center;justify-content:center;
+  width:32px;height:32px;border-radius:50%;color:var(--dim);
+  transition:color .2s ease,background .2s ease;
+}
+.footer__socials a:hover{color:var(--accent);background:var(--accent-lo)}
+.footer__socials a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.footer__socials svg{width:16px;height:16px;fill:currentColor}
+.footer__copy{font-size:.6rem;color:var(--mute);letter-spacing:.08em;opacity:.5}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .bear-body,.bear-scene__halo,.bear-scene__shadow,.bear-body__rim{transform:none!important}
+  .scanlines{animation:none!important}
+  #auroraCanvas,#particleCanvas{display:none}
+}
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+@media(max-width:600px){
+  .bear-scene{width:220px;height:220px;margin-bottom:1.5rem}
+  .cd-sep{display:none}
+  .countdown{gap:.4rem}
+  .signup__form{flex-direction:column;border-radius:12px}
+  .signup__btn{border-radius:0 0 12px 12px}
+  .hero{padding-top:5rem}
+}
+</style>
+</head>
+<body>
+
+<!-- Fixed layers -->
+<canvas id="auroraCanvas" class="layer" aria-hidden="true"></canvas>
+<div class="scanlines layer" aria-hidden="true"></div>
+<div class="vignette layer" aria-hidden="true"></div>
+<div class="bloom layer" id="bloom" aria-hidden="true"></div>
+<canvas id="particleCanvas" class="layer" aria-hidden="true"></canvas>
+<div class="grain layer" aria-hidden="true"></div>
+
+<div class="page">
+
+  <!-- Wordmark -->
+  <!-- Hero -->
+  <section class="hero" aria-label="Hero">
+
+    <img src="logo-wordmark.png" alt="CreativeCave" class="hero-logo">
+
+    <!-- Bear scene -->
+    <div class="bear-scene" id="bearScene">
+      <div class="bear-scene__deep-glow" id="deepGlow"></div>
+      <div class="bear-scene__halo" id="halo"></div>
+      <div class="bear-body" id="bearBody">
+        <img src="bear.png" alt="CreativeCave bear" width="440" height="440">
+        <div class="bear-body__rim" id="bearRim"></div>
+      </div>
+      <div class="bear-scene__shadow" id="bearShadow"></div>
+    </div>
+
+    <p class="eyebrow">The cave goes quiet before it roars.</p>
+
+    <h1 class="headline">
+      <span class="word" style="animation-delay:.9s">Same</span>&nbsp;
+      <span class="word" style="animation-delay:1.0s">Cave.</span>&nbsp;
+      <span class="word" style="animation-delay:1.15s">New</span>&nbsp;
+      <span class="word accent" style="animation-delay:1.35s">Everything.</span>
+    </h1>
+    <p class="subline">We tore it all down and rebuilt a studio that moves at the speed your content demands.</p>
+
+    <div class="triad" aria-label="Value proposition">
+      <span class="triad__word">Precision.</span>
+      <span class="triad__word">Automation.</span>
+      <span class="triad__word">Overkill.</span>
+    </div>
+
+    <!-- Countdown -->
+    <!-- TARGET DATE: 2026-08-01T00:00:00-04:00 (Eastern) -->
+    <div class="countdown-wrap">
+      <div class="countdown" id="countdown" data-target="2026-08-01T00:00:00-04:00">
+        <div class="cd-block"><div class="cd-digits" id="cdD">--</div><div class="cd-label">Days</div></div>
+        <div class="cd-sep" aria-hidden="true">/</div>
+        <div class="cd-block"><div class="cd-digits" id="cdH">--</div><div class="cd-label">Hours</div></div>
+        <div class="cd-sep" aria-hidden="true">/</div>
+        <div class="cd-block"><div class="cd-digits" id="cdM">--</div><div class="cd-label">Min</div></div>
+        <div class="cd-sep" aria-hidden="true">/</div>
+        <div class="cd-block"><div class="cd-digits" id="cdS">--</div><div class="cd-label">Sec</div></div>
+        <div class="cd-live" role="status">We're live.</div>
+      </div>
+    </div>
+
+    <!-- Email capture -->
+    <section class="signup" id="signup" aria-label="Early access">
+      <p class="signup__label">Drop your email. We'll do the rest.</p>
+      <form class="signup__form" id="signupForm" novalidate>
+        <label for="email" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Email</label>
+        <input class="signup__input" id="email" type="email" placeholder="your@email.com" required autocomplete="email">
+        <button class="signup__btn" type="submit">I Want In</button>
+      </form>
+      <div class="signup__ok" role="status">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        You're in.
+      </div>
+    </section>
+
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p class="footer__loc">Orlando &middot; Tampa &middot; St. Petersburg</p>
+    <ul class="footer__socials" aria-label="Social links">
+      <li><a href="https://www.instagram.com/creativecave.io/" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 1.5A4.25 4.25 0 003.5 7.75v8.5A4.25 4.25 0 007.75 20.5h8.5a4.25 4.25 0 004.25-4.25v-8.5A4.25 4.25 0 0016.25 3.5h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm0 1.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7zm5.25-.75a1 1 0 110 2 1 1 0 010-2z"/></svg></a></li>
+      <li><a href="https://www.linkedin.com/company/105533040" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a></li>
+    </ul>
+    <p class="footer__copy">Back soon, and it won't be subtle. &copy; 2026 CreativeCave</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+
+var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ===========================================================
+   CONFIG — all tunable values in one place
+   =========================================================== */
+var CFG = {
+  /* Bear tracking */
+  tiltX:      13,       // max rotateX degrees
+  tiltY:      16,       // max rotateY degrees
+  parallax:   18,       // px head shifts toward cursor
+  counterPx:  6,        // counter-parallax translate
+  lerp:       0.07,     // interpolation (lower = smoother)
+  idleBob:    8,        // idle float amplitude px
+  idleMs:     3500,     // idle cycle ms
+  /* Glow */
+  haloShift:  25,       // px halo shifts
+  glowBase:   0.5,      // base halo opacity
+  glowHover:  0.9,      // halo opacity when cursor near bear
+  glowRadius: 350,      // px — cursor proximity threshold
+  /* Particles */
+  count:      70,       // particle count
+  minSpeed:   0.15,
+  maxSpeed:   0.6,
+  minSize:    1,
+  maxSize:    2.5,
+  cursorRepel:80,       // repel radius
+  repelForce: 0.4,
+  /* Aurora */
+  auroraSpeed:0.0003
+};
+
+/* ===========================================================
+   MOUSE STATE
+   =========================================================== */
+var mx = 0.5, my = 0.5;
+var mxPx = window.innerWidth / 2;
+var myPx = window.innerHeight / 2;
+var active = false;
+var bloomEl = document.getElementById('bloom');
+
+function onMove(e) {
+  active = true;
+  mxPx = e.clientX; myPx = e.clientY;
+  mx = mxPx / window.innerWidth;
+  my = myPx / window.innerHeight;
+  bloomEl.style.setProperty('--mx', mxPx + 'px');
+  bloomEl.style.setProperty('--my', myPx + 'px');
+}
+document.addEventListener('mousemove', onMove, { passive: true });
+document.addEventListener('touchmove', function(e) { if (e.touches.length) onMove(e.touches[0]); }, { passive: true });
+document.addEventListener('mouseleave', function() { active = false; });
+
+/* ===========================================================
+   AURORA CANVAS (flat scope — no block nesting)
+   =========================================================== */
+var aC, aCtx, aT = 0;
+var drawAurora = function() {};
+
+if (!reduced) {
+  aC = document.getElementById('auroraCanvas');
+  aCtx = aC.getContext('2d');
+  aC.width = window.innerWidth; aC.height = window.innerHeight;
+  window.addEventListener('resize', function() { aC.width = window.innerWidth; aC.height = window.innerHeight; });
+
+  drawAurora = function(now) {
+    aT = now * CFG.auroraSpeed;
+    var w = aC.width, h = aC.height;
+    aCtx.clearRect(0, 0, w, h);
+
+    var x1 = w * (0.35 + 0.15 * Math.sin(aT * 0.7));
+    var y1 = h * (0.4 + 0.1 * Math.cos(aT * 0.5));
+    var r1 = Math.max(w, h) * 0.5;
+    var g1 = aCtx.createRadialGradient(x1, y1, 0, x1, y1, r1);
+    g1.addColorStop(0, 'rgba(29,161,242,0.06)');
+    g1.addColorStop(0.5, 'rgba(29,161,242,0.02)');
+    g1.addColorStop(1, 'transparent');
+    aCtx.fillStyle = g1;
+    aCtx.fillRect(0, 0, w, h);
+
+    var x2 = w * (0.65 + 0.12 * Math.cos(aT * 0.6));
+    var y2 = h * (0.55 + 0.12 * Math.sin(aT * 0.8));
+    var r2 = Math.max(w, h) * 0.45;
+    var g2 = aCtx.createRadialGradient(x2, y2, 0, x2, y2, r2);
+    g2.addColorStop(0, 'rgba(29,161,242,0.04)');
+    g2.addColorStop(0.6, 'rgba(10,40,80,0.02)');
+    g2.addColorStop(1, 'transparent');
+    aCtx.fillStyle = g2;
+    aCtx.fillRect(0, 0, w, h);
+
+    var x3 = w * (0.5 + 0.2 * Math.sin(aT * 0.4));
+    var y3 = h * (0.3 + 0.15 * Math.cos(aT * 0.3));
+    var r3 = Math.max(w, h) * 0.4;
+    var g3 = aCtx.createRadialGradient(x3, y3, 0, x3, y3, r3);
+    g3.addColorStop(0, 'rgba(29,100,180,0.03)');
+    g3.addColorStop(1, 'transparent');
+    aCtx.fillStyle = g3;
+    aCtx.fillRect(0, 0, w, h);
+  };
+}
+
+/* ===========================================================
+   PARTICLES (flat scope — no block nesting)
+   =========================================================== */
+var pC, pCtx, particles = [];
+var drawParticles = function() {};
+
+if (!reduced) {
+  pC = document.getElementById('particleCanvas');
+  pCtx = pC.getContext('2d');
+  pC.width = window.innerWidth; pC.height = window.innerHeight;
+  window.addEventListener('resize', function() { pC.width = window.innerWidth; pC.height = window.innerHeight; });
+
+  for (var i = 0; i < CFG.count; i++) {
+    particles.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      z: Math.random(),
+      vx: (Math.random() - 0.5) * CFG.maxSpeed,
+      vy: (Math.random() - 0.5) * CFG.maxSpeed - CFG.minSpeed,
+      size: CFG.minSize + Math.random() * (CFG.maxSize - CFG.minSize),
+      alpha: 0.1 + Math.random() * 0.4
+    });
+  }
+
+  drawParticles = function() {
+    var w = pC.width, h = pC.height;
+    pCtx.clearRect(0, 0, w, h);
+    for (var j = 0; j < particles.length; j++) {
+      var p = particles[j];
+      p.x += p.vx * (0.5 + p.z * 0.5);
+      p.y += p.vy * (0.5 + p.z * 0.5);
+      if (active) {
+        var dx = p.x - mxPx, dy = p.y - myPx;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < CFG.cursorRepel && dist > 0) {
+          var force = (1 - dist / CFG.cursorRepel) * CFG.repelForce;
+          p.x += (dx / dist) * force * p.z;
+          p.y += (dy / dist) * force * p.z;
+        }
+      }
+      if (p.x < -10) p.x = w + 10;
+      if (p.x > w + 10) p.x = -10;
+      if (p.y < -10) p.y = h + 10;
+      if (p.y > h + 10) p.y = -10;
+      pCtx.beginPath();
+      pCtx.arc(p.x, p.y, p.size * (0.4 + p.z * 0.6), 0, Math.PI * 2);
+      pCtx.fillStyle = 'rgba(200,210,220,' + p.alpha * p.z + ')';
+      pCtx.fill();
+    }
+  };
+}
+
+/* ===========================================================
+   BEAR TRACKING
+   =========================================================== */
+var bearBody = document.getElementById('bearBody');
+var halo = document.getElementById('halo');
+var deepGlow = document.getElementById('deepGlow');
+var bearRim = document.getElementById('bearRim');
+var bearShadow = document.getElementById('bearShadow');
+var bearScene = document.getElementById('bearScene');
+
+var cx = 0, cy = 0, tx = 0, ty = 0;
+var lastT = performance.now();
+
+/* Device orientation fallback */
+if (!reduced && 'DeviceOrientationEvent' in window) {
+  window.addEventListener('deviceorientation', function(e) {
+    if (!active && e.gamma !== null) {
+      tx = Math.max(-1, Math.min(1, (e.gamma || 0) / 30));
+      ty = Math.max(-1, Math.min(1, ((e.beta || 0) - 45) / 30));
+    }
+  }, { passive: true });
+}
+
+/* ===========================================================
+   MAIN LOOP
+   =========================================================== */
+function loop(now) {
+  if (!reduced) {
+    drawAurora(now);
+    drawParticles();
+
+    // Target from mouse
+    if (active) {
+      tx = (mx - 0.5) * 2;
+      ty = (my - 0.5) * 2;
+    } else {
+      tx *= 0.98; ty *= 0.98;
+    }
+
+    var dt = (now - lastT) / 16.67;
+    lastT = now;
+    var lf = 1 - Math.pow(1 - CFG.lerp, dt);
+    cx += (tx - cx) * lf;
+    cy += (ty - cy) * lf;
+
+    // Idle bob
+    var bobY = 0, bobS = 1;
+    if (!active) {
+      bobY = Math.sin(now / CFG.idleMs * Math.PI * 2) * CFG.idleBob;
+      bobS = 1 + Math.sin(now / CFG.idleMs * Math.PI * 2 + 1) * 0.006;
+    }
+
+    // Bear transform: tilt + parallax + counter-shift
+    var rY = cx * CFG.tiltY;
+    var rX = -cy * CFG.tiltX;
+    var pX = cx * CFG.parallax;
+    var pY = cy * CFG.parallax + bobY;
+    var cpX = -cx * CFG.counterPx;
+    var cpY = -cy * CFG.counterPx;
+
+    bearBody.style.transform =
+      'translate3d(' + (pX + cpX).toFixed(2) + 'px,' + (pY + cpY).toFixed(2) + 'px,0) ' +
+      'rotateX(' + rX.toFixed(2) + 'deg) rotateY(' + rY.toFixed(2) + 'deg) ' +
+      'scale(' + bobS.toFixed(4) + ')';
+
+    // Rim light — slides across surface
+    bearRim.style.setProperty('--rimX', (40 + cx * 20) + '%');
+    bearRim.style.setProperty('--rimY', (30 + cy * 15) + '%');
+
+    // Halo shifts toward cursor
+    var hX = cx * CFG.haloShift;
+    var hY = cy * CFG.haloShift * 0.4;
+    halo.style.transform = 'translateX(calc(-50% + ' + hX.toFixed(1) + 'px)) translateY(' + hY.toFixed(1) + 'px)';
+
+    // Deep glow shift (transform not fighting CSS animation anymore)
+    deepGlow.style.transform = 'translateX(calc(-50% + ' + (hX * 0.5).toFixed(1) + 'px))';
+
+    // Shadow responds to tilt
+    var sX = -cx * 10;
+    var sScale = 1 + Math.abs(cy) * 0.15;
+    bearShadow.style.transform = 'translateX(calc(-50% + ' + sX.toFixed(1) + 'px)) scaleX(' + sScale.toFixed(3) + ')';
+
+    // Glow intensity by proximity
+    var bearRect = bearScene.getBoundingClientRect();
+    var bCx = bearRect.left + bearRect.width / 2;
+    var bCy = bearRect.top + bearRect.height / 2;
+    var distToBear = Math.sqrt((mxPx - bCx) * (mxPx - bCx) + (myPx - bCy) * (myPx - bCy));
+    var prox = Math.max(0, 1 - distToBear / CFG.glowRadius);
+    var haloOp = CFG.glowBase + prox * (CFG.glowHover - CFG.glowBase);
+    halo.style.opacity = haloOp.toFixed(3);
+  }
+
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ===========================================================
+   COUNTDOWN
+   =========================================================== */
+var cdEl=document.getElementById('countdown');
+var target=new Date(cdEl.getAttribute('data-target')).getTime();
+var els={d:document.getElementById('cdD'),h:document.getElementById('cdH'),m:document.getElementById('cdM'),s:document.getElementById('cdS')};
+var prev={d:'',h:'',m:'',s:''};
+function pad(n){return n<10?'0'+n:''+n;}
+function upd(el,v,k){
+  if(prev[k]===v)return;prev[k]=v;
+  var ch=v.split(''),sp=el.querySelectorAll('.d');
+  if(sp.length!==ch.length){el.innerHTML='';ch.forEach(function(c){var s=document.createElement('span');s.className='d';s.textContent=c;el.appendChild(s);});return;}
+  ch.forEach(function(c,i){if(sp[i].textContent!==c){sp[i].style.transform='translateY(-100%)';sp[i].style.opacity='0';setTimeout(function(){sp[i].textContent=c;sp[i].style.transform='translateY(0)';sp[i].style.opacity='1';},150);}});
+}
+function cdTick(){
+  var d=target-Date.now();
+  if(d<=0){cdEl.classList.add('countdown--live');return;}
+  upd(els.d,pad(Math.floor(d/864e5)),'d');
+  upd(els.h,pad(Math.floor(d%864e5/36e5)),'h');
+  upd(els.m,pad(Math.floor(d%36e5/6e4)),'m');
+  upd(els.s,pad(Math.floor(d%6e4/1e3)),'s');
+  requestAnimationFrame(cdTick);
+}
+requestAnimationFrame(cdTick);
+
+/* ===========================================================
+   EMAIL
+   =========================================================== */
+var form=document.getElementById('signupForm');
+var inp=document.getElementById('email');
+var su=document.getElementById('signup');
+form.addEventListener('submit',function(e){
+  e.preventDefault();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inp.value.trim())){
+    inp.style.outline='2px solid #ff6b6b';inp.focus();
+    setTimeout(function(){inp.style.outline='';},1500);return;
+  }
+  su.classList.add('signup--done');
+});
+
+})();
+</script>
+</body>
+</html>
