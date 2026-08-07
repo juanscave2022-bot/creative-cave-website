@@ -4,20 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CreativeCave — Something Is Coming</title>
-<meta name="description" content="CreativeCave. Orlando, Tampa, and St. Petersburg's AI-forward media production and creative advertising studio. Launching August 2026.">
+<meta name="description" content="CreativeCave. Orlando, Tampa, and St. Petersburg's AI-forward media production and creative advertising studio. Launching August 25, 2026.">
 <meta name="theme-color" content="#060606">
 <style>
 /* ============================================================
    TOKENS
    ============================================================ */
 :root{
-  --bg:#060606;
-  --surface:#0c0c0c;
-  --border:#151515;
-  --text:#e8e6e1;
-  --dim:#6b6860;
-  --mute:#2a2822;
+  --bg:#000;
+  --surface:rgba(255,255,255,.05);
+  --border:rgba(255,255,255,.12);
+  --text:#f5f5f7;
+  --dim:#86868b;
+  --mute:#48484a;
   --accent:#1DA1F2;
+  --accent-hi:#7dd3fc;
   --accent-mid:rgba(29,161,242,.25);
   --accent-lo:rgba(29,161,242,.08);
   --accent-glow:rgba(29,161,242,.12);
@@ -46,24 +47,6 @@ canvas{display:block}
 
 /* Aurora / churning gradient */
 #auroraCanvas{z-index:0;opacity:.7}
-
-/* Scanline grid */
-.scanlines{
-  z-index:1;
-  opacity:.025;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.08) 2px,rgba(255,255,255,.08) 3px);
-  background-size:100% 4px;
-  animation:scanScroll 20s linear infinite;
-}
-@keyframes scanScroll{to{background-position:0 100vh}}
-
-/* Grain */
-.grain{
-  z-index:9998;
-  opacity:.03;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size:128px 128px;
-}
 
 /* Vignette */
 .vignette{
@@ -176,9 +159,9 @@ body:hover .bloom{opacity:1}
   width:100%;height:100%;
   object-fit:contain;
   display:block;
-  /* Edge blending: soft feathered mask fades bottom into glow */
-  mask-image:linear-gradient(to bottom,black 55%,rgba(0,0,0,.6) 80%,transparent 100%);
-  -webkit-mask-image:linear-gradient(to bottom,black 55%,rgba(0,0,0,.6) 80%,transparent 100%);
+  /* Edge blending: radial feather hides the image's square edges on pure black */
+  mask-image:radial-gradient(ellipse 70% 70% at 50% 48%,black 50%,rgba(0,0,0,.4) 68%,transparent 86%);
+  -webkit-mask-image:radial-gradient(ellipse 70% 70% at 50% 48%,black 50%,rgba(0,0,0,.4) 68%,transparent 86%);
   filter:drop-shadow(0 25px 50px rgba(0,0,0,.6));
 }
 
@@ -224,9 +207,9 @@ body:hover .bloom{opacity:1}
    ============================================================ */
 .headline{
   font-size:var(--fs-hero);
-  font-weight:800;
-  line-height:1.1;
-  letter-spacing:-.03em;
+  font-weight:700;
+  line-height:1.08;
+  letter-spacing:-.025em;
   max-width:700px;
   margin-bottom:.35rem;
 }
@@ -241,7 +224,13 @@ body:hover .bloom{opacity:1}
 @keyframes wordIn{
   to{opacity:1;transform:translateY(0);filter:blur(0)}
 }
-.headline .accent{color:var(--accent)}
+.headline .accent{
+  color:var(--accent);
+  background:linear-gradient(100deg,var(--accent-hi) 0%,var(--accent) 55%,#0a84ff 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
 
 .subline{
   font-size:var(--fs-md);
@@ -272,9 +261,30 @@ body:hover .bloom{opacity:1}
 }
 .triad__word{
   font-size:var(--fs-lg);
-  font-weight:700;
-  letter-spacing:.02em;
+  font-weight:600;
+  letter-spacing:-.01em;
   color:var(--text);
+}
+
+/* ============================================================
+   DATE LINE (Apple event style)
+   ============================================================ */
+.dateline{
+  margin-top:clamp(.75rem,1.5vw,1.25rem);
+  opacity:0;
+  animation:fadeUp 1s var(--ease) 1.95s forwards;
+}
+.dateline__date{
+  font-size:var(--fs-lg);
+  font-weight:600;
+  letter-spacing:-.015em;
+  color:var(--text);
+}
+.dateline__note{
+  font-size:var(--fs-sm);
+  color:var(--dim);
+  font-weight:400;
+  margin-top:.15rem;
 }
 
 /* ============================================================
@@ -297,7 +307,7 @@ body:hover .bloom{opacity:1}
 }
 .cd-digits{
   font-size:var(--fs-count);
-  font-weight:800;
+  font-weight:600;
   font-variant-numeric:tabular-nums;
   letter-spacing:-.02em;line-height:1;
   color:var(--text);
@@ -316,7 +326,7 @@ body:hover .bloom{opacity:1}
   line-height:1;align-self:flex-start;padding-top:.05em;user-select:none;
 }
 .countdown--live .cd-block,.countdown--live .cd-sep{display:none}
-.cd-live{display:none;font-size:var(--fs-lg);font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.cd-live{display:none;font-size:var(--fs-lg);font-weight:700;letter-spacing:-.01em;color:var(--accent)}
 .countdown--live .cd-live{display:block}
 
 /* ============================================================
@@ -331,13 +341,15 @@ body:hover .bloom{opacity:1}
   animation:fadeUp 1s var(--ease) 2.2s forwards;
 }
 .signup__label{
-  font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.15em;
-  color:var(--dim);font-weight:500;
+  font-size:var(--fs-sm);
+  color:var(--dim);font-weight:400;letter-spacing:0;
 }
 .signup__form{
   display:flex;width:100%;
   border:1px solid var(--border);border-radius:999px;
   overflow:hidden;background:var(--surface);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  backdrop-filter:blur(20px) saturate(180%);
   transition:border-color .2s ease;
 }
 .signup__form:focus-within{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent-lo)}
@@ -346,11 +358,11 @@ body:hover .bloom{opacity:1}
   border:none;color:var(--text);font-size:var(--fs-sm);
   font-family:var(--ff);outline:none;
 }
-.signup__input::placeholder{color:var(--mute)}
+.signup__input::placeholder{color:var(--dim)}
 .signup__btn{
-  padding:.75rem 1.5rem;background:var(--accent);color:var(--bg);
+  padding:.75rem 1.5rem;background:var(--accent);color:#fff;
   border:none;font-family:var(--ff);font-size:var(--fs-sm);
-  font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  font-weight:600;letter-spacing:-.01em;
   cursor:pointer;border-radius:0 999px 999px 0;
   transition:background .2s ease,transform .15s var(--spring);
   white-space:nowrap;
@@ -360,9 +372,11 @@ body:hover .bloom{opacity:1}
 .signup__btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .signup__ok{
   display:none;padding:.75rem 1.5rem;font-size:var(--fs-sm);
-  color:var(--accent);font-weight:600;letter-spacing:.05em;
-  text-transform:uppercase;border:1px solid var(--accent-lo);
+  color:var(--accent);font-weight:600;letter-spacing:0;
+  border:1px solid var(--accent-lo);
   border-radius:999px;background:var(--accent-lo);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  backdrop-filter:blur(20px) saturate(180%);
   animation:popIn .5s var(--spring);
 }
 .signup--done .signup__form{display:none}
@@ -397,7 +411,6 @@ footer{
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .bear-body,.bear-scene__halo,.bear-scene__shadow,.bear-body__rim{transform:none!important}
-  .scanlines{animation:none!important}
   #auroraCanvas,#particleCanvas{display:none}
 }
 
@@ -418,11 +431,9 @@ footer{
 
 <!-- Fixed layers -->
 <canvas id="auroraCanvas" class="layer" aria-hidden="true"></canvas>
-<div class="scanlines layer" aria-hidden="true"></div>
 <div class="vignette layer" aria-hidden="true"></div>
 <div class="bloom layer" id="bloom" aria-hidden="true"></div>
 <canvas id="particleCanvas" class="layer" aria-hidden="true"></canvas>
-<div class="grain layer" aria-hidden="true"></div>
 
 <div class="page">
 
@@ -458,10 +469,16 @@ footer{
       <span class="triad__word">Overkill.</span>
     </div>
 
+    <!-- Date line -->
+    <div class="dateline">
+      <p class="dateline__date">August&nbsp;25</p>
+      <p class="dateline__note">Mark your calendar.</p>
+    </div>
+
     <!-- Countdown -->
-    <!-- TARGET DATE: 2026-08-01T00:00:00-04:00 (Eastern) -->
+    <!-- TARGET DATE: 2026-08-25T00:00:00-04:00 (Eastern) -->
     <div class="countdown-wrap">
-      <div class="countdown" id="countdown" data-target="2026-08-01T00:00:00-04:00">
+      <div class="countdown" id="countdown" data-target="2026-08-25T00:00:00-04:00">
         <div class="cd-block"><div class="cd-digits" id="cdD">--</div><div class="cd-label">Days</div></div>
         <div class="cd-sep" aria-hidden="true">/</div>
         <div class="cd-block"><div class="cd-digits" id="cdH">--</div><div class="cd-label">Hours</div></div>
