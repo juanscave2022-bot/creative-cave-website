@@ -179,7 +179,7 @@ Key lines in use:
 - Badge: "AUTHENTIC BRANDING, EST 2022"
 - Footer: "*see you in the cave*" / "MADE BY HAND ★★★ TAMPA, FL"
 - CTAs: "JOIN THE WAITLIST", "I Want In"
-- Locations: Orlando · Tampa · St. Petersburg
+- Locations: Orlando · Tampa · St. Petersburg · Austin
 
 Words we like: authentic, real, human, made by hand, community, connection, the cave.
 Words to avoid: synergy, leverage, cutting-edge, revolutionary, "AI-powered" as a headline.
