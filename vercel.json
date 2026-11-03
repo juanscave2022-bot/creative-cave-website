@@ -1,0 +1,12 @@
+{
+  "headers": [
+    {
+      "source": "/bear.html",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
+    },
+    {
+      "source": "/(.*)\\.(png|svg|jpg|webp)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }]
+    }
+  ]
+}

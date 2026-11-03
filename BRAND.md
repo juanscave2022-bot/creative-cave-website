@@ -277,10 +277,24 @@ creative-cave-website/
 
 Live: https://creativecave.io (deployed with the Vercel CLI from this folder: `vercel --prod`)
 
-## 14. Open items
+## 14. SEO
+
+- Title: "Creative Cave | Authentic Branding Studio in Tampa & Orlando" (keep under ~60 characters)
+- Meta description mentions all four cities and the Nov 25 launch
+- Canonical: https://www.creativecave.io/
+- Share image: `og-image.png` (1200 x 630). Edit `tools/og/og.html`, then rebuild from the repo root:
+  `"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --hide-scrollbars --window-size=1200,630 --virtual-time-budget=4000 --screenshot=og-image.png "file://$PWD/tools/og/og.html"`
+- Structured data (JSON-LD in the page head): Organization (with founding year 2022, the four cities, Instagram and LinkedIn), WebSite and FAQPage. Update the FAQPage block whenever FAQ copy changes.
+- `robots.txt` allows everything and points to `sitemap.xml`. Update `<lastmod>` in the sitemap when the page changes a lot.
+- `vercel.json` marks the old `bear.html` as noindex and caches images for a week.
+- Google Search Console: property for creativecave.io, sitemap submitted (see open items)
+
+## 15. Open items
 
 - [ ] Trimmed SVG or 2000px+ export of the logo
 - [ ] Hook the email form up to a real list (Klaviyo, Mailchimp, etc.). Right now it only shows "You're in."
 - [ ] Confirm every client in the carousel is OK to show publicly
 - [ ] Higher-res Alphalete and Toyota Gazoo Racing logos (current files are 288px)
 - [ ] Optional: web embedding license for Canyon
+- [ ] Verify creativecave.io in Google Search Console and submit the sitemap
+- [ ] Create or claim a Google Business Profile for Creative Cave
