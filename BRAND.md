@@ -180,6 +180,11 @@ Key lines in use:
 - Footer: "*see you in the cave*" / "MADE BY HAND ★★★ TAMPA, FL"
 - CTAs: "JOIN THE WAITLIST", "I Want In"
 - Locations: Orlando · Tampa · St. Petersburg · Austin
+- Awards: "THE 2026 GRIZZLIES ★ our year-end awards for the local businesses doing it right"
+
+### The Grizzlies
+
+Creative Cave's year-end awards for local businesses. On the site it stays subtle: one dim line under the client carousel (bear mark + "THE 2026 GRIZZLIES" in Canyon + a short note) and an FAQ entry. Next year, regenerate the Canyon lettering with the new year (`lettering.py "griz|THE 2027 GRIZZLIES|50"`).
 
 Words we like: authentic, real, human, made by hand, community, connection, the cave.
 Words to avoid: synergy, leverage, cutting-edge, revolutionary, "AI-powered" as a headline.
