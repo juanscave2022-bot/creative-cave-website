@@ -2,7 +2,7 @@
 
 Living brand guide for Creative Cave. Start here when designing anything new (site sections, social, decks, merch) so it stays consistent with the November 25, 2026 launch site at creativecave.io.
 
-Last updated: November 3, 2026
+Last updated: November 4, 2026
 
 ---
 
@@ -30,7 +30,7 @@ Three colors. Nothing else.
 |---|---|---|---|
 | **Seal Blue** | `#DBF2FC` | 219, 242, 252 | Light base. Backgrounds, and text on navy |
 | **Navy Blue** | `#072D59` | 7, 45, 89 | Dark base. Text on seal, dark sections, logo |
-| **Crimson Pink** | `#FD6E88` | 253, 110, 136 | The accent. Use sparingly so it pops |
+| **Coral Red** | `#FD614B` | 253, 97, 75 | The accent. Use sparingly so it pops |
 
 > "The first two colors set the mood. The accent gives it life."
 
@@ -38,9 +38,9 @@ Three colors. Nothing else.
 
 | Token | Value | Use |
 |---|---|---|
-| Crimson hover | `#ff8ea3` | Button hover |
-| Crimson pressed | `#f4506f` | Button active |
-| Crimson glow | `rgba(253,110,136,.2)` | Soft fills, focus halos |
+| Coral hover | `#ff7f6c` | Button hover |
+| Coral pressed | `#e8492f` | Button active |
+| Coral glow | `rgba(253,97,75,.2)` | Soft fills, focus halos |
 | Navy 74% | `rgba(7,45,89,.74)` | Secondary text on seal |
 | Navy 50% | `rgba(7,45,89,.5)` | Hints, captions on seal |
 | Seal 74% | `rgba(219,242,252,.74)` | Secondary text on navy |
@@ -48,16 +48,16 @@ Three colors. Nothing else.
 
 ### How the colors work together
 
-- **Light scope (top of the page, hero):** Seal background, Navy text, Crimson accents. Soft crimson and white glows in the corners.
-- **Dark scope (everything below the hero):** Navy background, Seal text, Crimson accents.
-- **The transition:** a gradient band from seal to navy, with the crimson longhorn herd walking across it.
-- **Game sky:** gradient from Navy down to a Crimson horizon (`#072D59` → `#2b5585` → `#a77a9c` → `#FD6E88`).
+- **Light scope (top of the page, hero):** Seal background, Navy text, Coral accents. Soft coral and white glows in the corners.
+- **Dark scope (everything below the hero):** Navy background, Seal text, Coral accents.
+- **The transition:** a gradient band from seal to navy, with the coral longhorn herd walking across it.
+- **Game sky:** gradient from Navy down to a Coral horizon (`#072D59` → `#2b5585` → `#b0786f` → `#FD614B`).
 
 ### Contrast rules
 
-- Crimson on Seal is **low contrast**. Use it for big or decorative things only (script words, badges, stars, button fills). Never for small body text.
-- Crimson on Navy reads well. Script words and accents can be crimson in the dark sections.
-- Buttons: crimson fill with **white Canyon lettering** (nav "Join the Waitlist"), or crimson fill with **navy text** (form "I Want In").
+- Coral on Seal is **low contrast**. Use it for big or decorative things only (script words, badges, stars, button fills). Never for small body text.
+- Coral on Navy reads well. Script words and accents can be coral in the dark sections.
+- Buttons: coral fill with **white Canyon lettering** (nav "Join the Waitlist"), or coral fill with **navy text** (form "I Want In").
 
 ### CSS tokens
 
@@ -65,9 +65,9 @@ Three colors. Nothing else.
 :root{
   --seal:#DBF2FC;
   --navy:#072D59;
-  --crimson:#FD6E88;
-  --crimson-hi:#ff8ea3;
-  --crimson-lo:rgba(253,110,136,.2);
+  --coral:#FD614B;
+  --coral-hi:#ff7f6c;
+  --coral-lo:rgba(253,97,75,.2);
 }
 ```
 
@@ -111,7 +111,7 @@ In the page, outlines go in an `<svg class="cy">` with `fill:currentColor`, size
 
 ### Script move (the signature)
 
-- One word in Yellowtail, crimson, rotated about **-7deg**, nudged up so it overlaps the line above.
+- One word in Yellowtail, coral, rotated about **-7deg**, nudged up so it overlaps the line above.
 - It should look intentionally a little sloppy, like we wrote it on there ourselves.
 - No underline under "playbook." (removed on purpose).
 - Current script words: "playbook.", "the", "Frequently", "almost there", "see you in the cave".
@@ -145,10 +145,10 @@ The "Authentic Branding" badge, modeled on classic longhorn ranch plates.
 
 - Outer and inner navy rings.
 - **"AUTHENTIC"** curved along the top, **"BRANDING"** along the bottom, in Canyon.
-- Navy notched banner plate across the middle reading **"EST"** and **"2022"** in **crimson**.
+- Navy notched banner plate across the middle reading **"EST"** and **"2022"** in **coral**.
 - Bear mark centered in an open navy ring, with **no background fill** (page shows through).
 - Navy curled scroll wings, a navy rule under the banner, and four short navy rays.
-- No other crimson on the badge except EST 2022.
+- No other coral on the badge except EST 2022.
 - Placement: stamped at about 9deg to the upper right of the headline on desktop. Under the headline on phones.
 - Source: `tools/canyon/badge.py` (viewBox 220 x 160).
 
@@ -159,9 +159,9 @@ The "Authentic Branding" badge, modeled on classic longhorn ranch plates.
 | Motif | Spec |
 |---|---|
 | **Print grain** | Fixed overlay over everything: 5px halftone dot grid + fractal noise, `mix-blend-mode:overlay`, 55% opacity |
-| **Longhorn herd** | Pixel longhorns (26 x 12 grid), crimson, drawn through a 3px halftone dot mask, walking left to right, 38s loop, two-frame leg animation. Fades in and out at the edges |
+| **Longhorn herd** | Pixel longhorns (26 x 12 grid), coral, drawn through a 3px halftone dot mask, walking left to right, 38s loop, two-frame leg animation. Fades in and out at the edges |
 | **Rope divider** | Two interlaced wavy strokes, seal at 45% opacity, in the footer |
-| **Stars** | ★ in crimson as separators ("★ NOVEMBER 25 ★", "MADE BY HAND ★★★ TAMPA, FL") |
+| **Stars** | ★ in coral as separators ("★ NOVEMBER 25 ★", "MADE BY HAND ★★★ TAMPA, FL") |
 | **Mesas** | Two parallax layers of flat-topped pixel buttes, navy at 50% and 26% |
 | **Cacti** | Pixel saguaros, navy silhouettes |
 
@@ -197,11 +197,11 @@ Words to avoid: synergy, leverage, cutting-edge, revolutionary, "AI-powered" as 
 |---|---|
 | **Nav** | Fixed, translucent seal glass (`rgba(219,242,252,.74)` + 20px blur). Bear mark, then pills: Home (navy filled, active), Play, FAQ, Contact. Right side: Join the Waitlist |
 | **Pills** | 36px tall, fully rounded, 1px border, press scales to 0.97 |
-| **Join the Waitlist** | Solid crimson pill, white Canyon lettering, soft crimson shadow. Scrolls to the email form and focuses it |
-| **Email form** | Rounded bar, translucent fill, crimson "I Want In" button with navy text |
+| **Join the Waitlist** | Solid coral pill, white Canyon lettering, soft coral shadow. Scrolls to the email form and focuses it |
+| **Email form** | Rounded bar, translucent fill, coral "I Want In" button with navy text |
 | **Countdown** | Navy tabular numbers, Canyon labels (DAYS HRS MIN SEC), "almost there" in script above |
 | **Client carousel** | Full-width row of white client logos, 42s continuous scroll, pauses on hover, edges fade out. Logos sized for equal visual weight (wide marks shorter, stacked marks taller). Reduced motion shows a static wrapped grid |
-| **FAQ** | Rounded translucent cards, crimson plus icon that rotates into an X, smooth height open |
+| **FAQ** | Rounded translucent cards, coral plus icon that rotates into an X, smooth height open |
 
 ---
 
@@ -218,7 +218,7 @@ Words to avoid: synergy, leverage, cutting-edge, revolutionary, "AI-powered" as 
 ## 10. The game: Bear Runner
 
 - Pixel bear (seal) runs across a dusk ranch. Space, up arrow or tap to jump. A short tap gives a short hop.
-- Obstacles: navy saguaro cacti (single and double). After score 250, crimson bats: low ones you jump, high ones you stay under.
+- Obstacles: navy saguaro cacti (single and double). After score 250, coral bats: low ones you jump, high ones you stay under.
 - Speeds up over time. Score flashes every 100. High score saved in the browser.
 - HUD in Anton. Messages: "READY?", "GAME OVER", "ONE MORE RUN".
 
@@ -227,7 +227,7 @@ Words to avoid: synergy, leverage, cutting-edge, revolutionary, "AI-powered" as 
 ## 11. Do and don't
 
 **Do**
-- Keep it to Seal, Navy and Crimson.
+- Keep it to Seal, Navy and Coral.
 - Mix one Canyon line with one script word for headings.
 - Let things look a little hand-made and imperfect on purpose.
 - Leave space. Simple beats busy.
@@ -235,7 +235,7 @@ Words to avoid: synergy, leverage, cutting-edge, revolutionary, "AI-powered" as 
 **Don't**
 - Add new colors, gradients outside the palette, or neon.
 - Use Canyon as a live web font (license).
-- Use crimson for small text on seal.
+- Use coral for small text on seal.
 - Use em dashes in copy.
 - Copy other brands' marks or phrases (the ranch inspo is for style only).
 

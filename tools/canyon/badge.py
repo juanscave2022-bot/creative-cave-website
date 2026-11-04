@@ -57,8 +57,8 @@ svg = f'''<svg viewBox="0 0 220 160" role="img" aria-label="Creative Cave, Authe
   </g>
   <!-- banner plate across the middle -->
   <path d="M28 66 L 192 66 L 183 76 L 192 86 L 28 86 L 37 76 Z" fill="var(--navy)"/>
-  {straight("EST", 62, 80.5, 8, 90, fill="var(--crimson)")}
-  {straight("2022", 158, 80.5, 8, 90, fill="var(--crimson)")}
+  {straight("EST", 62, 80.5, 8, 90, fill="var(--coral)")}
+  {straight("2022", 158, 80.5, 8, 90, fill="var(--coral)")}
   </g>
   <!-- bear medallion: open ring, page shows through behind the bear -->
   <circle cx="{CX}" cy="{CY-2}" r="24" fill="none" stroke="var(--navy)" stroke-width="2.5"/>
